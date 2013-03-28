@@ -196,7 +196,9 @@ public class MediaPlaybackService extends Service {
                     break;
                 case TRACK_ENDED:
                     if (mRepeatMode == REPEAT_CURRENT) {
-                        seek(0);
+                    	/* modified by vilan */
+                    	Log.i("MediaPlaybackService.java","**********TRACK_ENDED, reopened the audio ************");
+                    	openCurrent();	// seek(0);
                         play();
                     } else {
                         next(false);
@@ -713,6 +715,15 @@ public class MediaPlaybackService extends Service {
      */
     public void closeExternalStorageFiles(String storagePath) {
         // stop playback and clean up if the SD card is going to be unmounted.
+    	/* add by chenjd,chenjd@allwinnertech.com,20120113
+    	 * don't let the playing stop 
+    	 */
+    	SharedPreferences spf = getSharedPreferences("current", 0);
+       	String music = spf.getString("PlayedMusic", "null");
+       	if(!music.contains(storagePath))
+       	{
+       		return;
+       	}
         stop(true);
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
@@ -739,7 +750,7 @@ public class MediaPlaybackService extends Service {
                         reloadQueue();
                         mQueueIsSaveable = true;
                         notifyChange(QUEUE_CHANGED);
-                        notifyChange(META_CHANGED);
+                        //notifyChange(META_CHANGED);
                     }
                 }
             };
